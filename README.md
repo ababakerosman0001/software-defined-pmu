@@ -12,63 +12,17 @@ A complete implementation of a Phasor Measurement Unit (PMU) built from first pr
 
 This project implements a full PMU pipeline across five phases, from raw voltage signal acquisition to a validated IEEE C37.118-2005 compliant data stream received by a professional PDC client.
 
-```
-Simulink Grid Model
-      |
-      v
-PMU Signal Processor  (DFT-based phasor estimation)
-      |
-      v
-Timestamp Engine      (UTC synchronization, SOC + FRACSEC)
-      |
-      v
-C37.118 Frame Encoder (binary protocol implementation)
-      |
-      v
-TCP Streaming Server  (PMU server, 50 frames/second)
-      |
-      v
-Industry Validation   (Wireshark + PMU Connection Tester)
-```
+
 
 ---
 
-## Repository Structure
 
-```
-software-defined-pmu/
-|
-|-- simulation/               MATLAB and Simulink files
-|   |-- grid.slx              Three-bus Simulink power system model
-|   |-- run_pmu_estimator.m   DFT-based phasor, frequency, and ROCOF estimator
-|   |-- to_timestamp.m        IEEE C37.118 UTC timestamp encoder (SOC + FRACSEC)
-|   |-- main.m                Top-level script that runs all MATLAB phases
-|
-|-- protocol/                 Python files
-|   |-- tcp_server.py         IEEE C37.118 PMU TCP server with Config and Data frames
-|   |-- client.py             Test PDC client for frame reception and CRC verification
-|   |-- data.mat              Exported MATLAB phasor data loaded by the TCP server
-|
-|-- docs/
-    |-- images/               All verification and output screenshots
-```
-
----
 
 ## Phase 1 — Power Grid Simulation
 
 A three-bus power system modelled in Simulink using Simscape Electrical. The model includes a three-phase fault injected at Bus 2 between t = 0.1s and t = 0.2s.
 
-**Topology:**
 
-```
-Source 1 --> Line 1 --> Bus 2 --> Line 2 --> Bus 3
-                          |                    |
-                        Fault               Load
-                      V-I Meas
-                          |
-                        Vbus2
-```
 
 **Simulink Model:**
 
@@ -158,17 +112,7 @@ All 4,801 frames passed CRC verification. Zero encoding errors.
 
 The PMU server streams frames at 50 frames per second over TCP on port 4712 using deadline-based timing. Nagle's algorithm is disabled via `TCP_NODELAY` to ensure immediate frame transmission.
 
-**Connection sequence:**
 
-```
-PDC connects
-   |
-   v
-Server sends Configuration Frame 2 immediately
-   |
-   v
-Server streams Data Frames continuously at 50 fps
-```
 
 **TCP server and test client running simultaneously:**
 
@@ -297,16 +241,7 @@ ID Code:   7
 
 Using Wireshark:
 ```
-Interface: Npcap Loopback Adapter
+Interface: Adapter for loopback traffic capture
 Filter:    tcp.port == 4712
 ```
 
----
-
-## References
-
-IEEE Std C37.118-2005, IEEE Standard for Synchrophasors for Power Systems.
-
-A. G. Phadke and J. S. Thorp, Synchronized Phasor Measurements and Their Applications, Springer, 2008.
-
-P. Kundur, Power System Stability and Control, McGraw-Hill, 1994.
