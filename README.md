@@ -2,9 +2,6 @@
 
 A complete implementation of a Phasor Measurement Unit (PMU) built from first principles, covering grid simulation, signal processing, IEEE C37.118-2005 protocol encoding, TCP streaming, and real-time validation against industry-standard tools.
 
-**Author:** Ababaker  
-**Standard:** IEEE C37.118-2005  
-**Language:** MATLAB / Python  
 
 ---
 
